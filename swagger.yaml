@@ -1,0 +1,134 @@
+swagger: "2.0"
+info:
+  description: "Morpher.ru API"
+  version: "3.0.0"
+  title: "Morpher.ru API"
+  termsOfService: "http://morpher.ru/ws3/"
+  contact:
+    email: "support@morpher.ru"
+host: "ws3.morpher.ru"
+basePath: "/"
+tags:
+- name: "russian/declension"
+  description: "Склонение по падежам на русском языке"
+  externalDocs:
+    description: "Документация"
+    url: "http://morpher.ru/ws3/#declension"
+schemes:
+- "https"
+- "http"
+paths:
+  /russian/declension:
+    post:
+      tags:
+      - "russian/declension"
+      summary: "Склонение списка"
+      description: "Склонение списка наименований"
+      operationId: "getRussianDeclensionList"
+      consumes:
+      - "text/plain"
+      produces:
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "list"
+        description: "Список наименований для склонения, по одному на строке"
+        #example: "\nкошка\nсобака\nверблюд"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/DeclensionList"
+      security:
+      - {}
+      - api_key: []
+    get:
+      tags:
+      - "russian/declension"
+      summary: "Склонение одного слова или фразы"
+      description: ""
+      operationId: "getRussianDeclension"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "s"
+        in: "query"
+        description: "Строка для склонения"
+        #example: "кошка"
+        required: true
+        type: "string"
+      - name: "flags"
+        in: "query"
+        type: "string"
+        description: "Дополнительная информация о входном слове"
+        required: false
+        enum:
+        - "Masculine"
+        - "Feminine"
+        - "Animate"
+        - "Inanimate"
+        - "Common" # Нарицательное
+        - "Name"   # ФИО
+      responses:
+        "200":
+          description: "OK"
+        "495":
+          description: "Склонение числительных не поддерживается."
+        "496":
+          description: "Не найдено русских слов."
+        "494":
+          description: "Неправильные флаги."
+      security:
+      - {}
+      - api_key: []
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Error:
+    type: "object"
+    properties:
+      code:
+        type: "string"
+        format: "Int32"
+      message:
+        type: "string"
+  DeclensionForms:
+    type: "object"
+    properties:
+      И: {type: "string"}
+      Р: {type: "string"}
+      Д: {type: "string"}
+      В: {type: "string"}
+      Т: {type: "string"}
+      П: {type: "string"}
+      П_о: {type: "string"}
+  DeclensionResult:
+    allOf:
+    - $ref: '#/definitions/DeclensionForms'
+    - type: "object"
+      properties:
+        множественное:
+          $ref: '#/definitions/DeclensionForms'
+        где: {type: "string"}
+        куда: {type: "string"}
+        откуда: {type: "string"}
+        род: 
+          type: "string"
+          enum:
+          - "Мужской"
+          - "Женский"
+          - "Средний"
+          - "" # Множественное число
+  DeclensionList:
+    type: "array"
+    items:
+      $ref: "#/definitions/DeclensionResult"
+  
+      
