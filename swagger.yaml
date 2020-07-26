@@ -33,7 +33,7 @@ paths:
       - in: "body"
         name: "list"
         description: "Список наименований для склонения, по одному на строке"
-        #example: "\nкошка\nсобака\nверблюд"
+        #example: "\nкошка\nсобака\nдвухгорбый верблюд"
         required: true
         schema:
           type: "string"
@@ -49,7 +49,7 @@ paths:
       tags:
       - "russian/declension"
       summary: "Склонение одного слова или фразы"
-      description: ""
+      description: "Склоняет слово или фразу по падежам и числам, определяет род, разбивает ФИО на фамилию, имя и отчество."
       operationId: "getRussianDeclension"
       produces:
       - "application/xml"
@@ -63,25 +63,35 @@ paths:
         type: "string"
       - name: "flags"
         in: "query"
-        type: "string"
         description: "Дополнительная информация о входном слове"
         required: false
-        enum:
-        - "Masculine"
-        - "Feminine"
-        - "Animate"
-        - "Inanimate"
-        - "Common" # Нарицательное
-        - "Name"   # ФИО
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "Masculine"
+          - "Feminine"
+          - "Animate"
+          - "Inanimate"
+          - "Common" # Нарицательное
+          - "Name"   # ФИО
       responses:
         "200":
           description: "OK"
+          schema:
+            $ref: "#/definitions/DeclensionResult"
         "495":
           description: "Склонение числительных не поддерживается."
+          schema:
+            $ref: "#/definitions/Error"
         "496":
           description: "Не найдено русских слов."
+          schema:
+            $ref: "#/definitions/Error"
         "494":
           description: "Неправильные флаги."
+          schema:
+            $ref: "#/definitions/Error"
       security:
       - {}
       - api_key: []
